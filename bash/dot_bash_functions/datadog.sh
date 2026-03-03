@@ -41,6 +41,130 @@ ddlog-send() {
   fi
 }
 
+# Usage:
+#   dddash list                         - List all dashboards (id, title)
+#   dddash search <query>               - Search dashboards by title
+#   dddash get <id>                     - Download full dashboard JSON to /tmp/<id>.json
+#   dddash widgets <id>                 - List widgets (id, type, title) for a dashboard
+#   dddash group <id> <group_id>        - Show widgets inside a group
+#   dddash update <id> <file.json>      - Update dashboard from JSON file
+#   dddash backup <id>                  - Save a timestamped backup before editing
+#
+# Workflow: edit a dashboard group
+#   dddash backup 7b5-byq-mcv                          # save a backup first
+#   dddash get 7b5-byq-mcv                             # download to /tmp/7b5-byq-mcv.json
+#   dddash widgets 7b5-byq-mcv                         # find the group id
+#   dddash group 7b5-byq-mcv <group_id>                # inspect the group
+#   # edit /tmp/7b5-byq-mcv.json (modify the group's widgets/layouts)
+#   dddash update 7b5-byq-mcv /tmp/7b5-byq-mcv.json   # push changes
+dddash() {
+  local api="https://api.datadoghq.com/api/v1/dashboard"
+  local auth=(-H "DD-API-KEY: $DATADOG_API_KEY" -H "DD-APPLICATION-KEY: $DATADOG_APP_KEY")
+  local cmd="${1:-help}"
+  shift 2>/dev/null
+
+  case "$cmd" in
+    list)
+      curl -s -X GET "$api" "${auth[@]}" \
+        | jq -r '.dashboards[] | "\(.id)\t\(.title)"' \
+        | column -t -s $'\t'
+      ;;
+
+    search)
+      if [ -z "$1" ]; then echo "Usage: dddash search <query>"; return 1; fi
+      local query="$1"
+      curl -s -X GET "$api" "${auth[@]}" \
+        | jq -r --arg q "$query" '.dashboards[] | select(.title | test($q; "i")) | "\(.id)\t\(.title)"' \
+        | column -t -s $'\t'
+      ;;
+
+    get)
+      if [ -z "$1" ]; then echo "Usage: dddash get <id>"; return 1; fi
+      local file="/tmp/$1.json"
+      curl -s -X GET "${api}/$1" "${auth[@]}" > "$file"
+      local title
+      title=$(jq -r '.title // "unknown"' "$file")
+      local count
+      count=$(jq '.widgets | length' "$file")
+      echo "✓ Saved to $file ($title, $count top-level widgets)"
+      ;;
+
+    widgets)
+      if [ -z "$1" ]; then echo "Usage: dddash widgets <id>"; return 1; fi
+      local file="/tmp/$1.json"
+      if [ ! -f "$file" ]; then
+        curl -s -X GET "${api}/$1" "${auth[@]}" > "$file"
+      fi
+      jq -r '.widgets[] | "\(.id)\t\(.definition.type)\t\(.definition.title // "(no title)")"' "$file" \
+        | column -t -s $'\t'
+      ;;
+
+    group)
+      if [ -z "$1" ] || [ -z "$2" ]; then
+        echo "Usage: dddash group <dashboard_id> <group_widget_id>"
+        return 1
+      fi
+      local file="/tmp/$1.json"
+      if [ ! -f "$file" ]; then
+        curl -s -X GET "${api}/$1" "${auth[@]}" > "$file"
+      fi
+      local gid="$2"
+      jq -r --argjson gid "$gid" '.widgets[] | select(.id == $gid) | .definition.widgets[] |
+        "\(.id // "new")\t\(.definition.type)\t\(.definition.title // "(no title)")\t\(.layout | "\(.x),\(.y) \(.width)x\(.height)")"' "$file" \
+        | column -t -s $'\t'
+      ;;
+
+    update)
+      if [ -z "$1" ] || [ -z "$2" ] || [ ! -f "$2" ]; then
+        echo "Usage: dddash update <id> <file.json>"
+        return 1
+      fi
+      curl -s -X PUT "${api}/$1" "${auth[@]}" \
+        -H "Content-Type: application/json" \
+        -d @"$2" \
+        | jq '{id: .id, title: .title, url: .url, modified_at: .modified_at, errors: .errors}'
+      ;;
+
+    backup)
+      if [ -z "$1" ]; then echo "Usage: dddash backup <id>"; return 1; fi
+      local ts
+      ts=$(date +%Y%m%d-%H%M%S)
+      local file="/tmp/$1-backup-${ts}.json"
+      curl -s -X GET "${api}/$1" "${auth[@]}" > "$file"
+      local title
+      title=$(jq -r '.title // "unknown"' "$file")
+      echo "✓ Backup saved to $file ($title)"
+      ;;
+
+    help|*)
+      echo "Usage: dddash <command> [args]"
+      echo ""
+      echo "Commands:"
+      echo "  list                              List all dashboards"
+      echo "  search <query>                    Search dashboards by title"
+      echo "  get <id>                          Download dashboard JSON to /tmp/<id>.json"
+      echo "  widgets <id>                      List top-level widgets (id, type, title)"
+      echo "  group <dash_id> <group_id>        Show widgets inside a group"
+      echo "  update <id> <file.json>           Update dashboard from JSON file"
+      echo "  backup <id>                       Save timestamped backup to /tmp/"
+      echo ""
+      echo "Workflow:"
+      echo "  dddash backup 7b5-byq-mcv"
+      echo "  dddash get 7b5-byq-mcv"
+      echo "  dddash widgets 7b5-byq-mcv"
+      echo "  dddash group 7b5-byq-mcv 12345"
+      echo "  # edit /tmp/7b5-byq-mcv.json"
+      echo "  dddash update 7b5-byq-mcv /tmp/7b5-byq-mcv.json"
+      echo ""
+      echo "Tips:"
+      echo "  - Group widgets need explicit layout: {x, y, width, height}"
+      echo "  - Use 'manage_status' type for Monitor Summary widgets"
+      echo "  - Use 'alert_value' type for single-value alert count widgets"
+      echo "  - Use 'alert_graph' type with viz_type=timeseries for alert timelines"
+      ;;
+  esac
+}
+
 ddlogs() {
   local query="${1:-*}"
   local timeframe="${2:-1h}"
