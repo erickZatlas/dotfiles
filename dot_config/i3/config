@@ -1,0 +1,194 @@
+# i3 config - v4
+# Mod key: Super (Windows key)
+set $mod Mod4
+
+# Terminal
+set $term wezterm
+
+# Font
+font pango:FiraCode Nerd Font 10
+
+# ─── Keyboard Layout ─────────────────────────────────────────────────
+exec_always --no-startup-id setxkbmap -layout br,us -option grp:alt_shift_toggle
+exec --no-startup-id xinput set-prop "VEN_27C6:00 27C6:0D53 Touchpad" "libinput Tapping Enabled" 1
+exec --no-startup-id xinput set-prop "VEN_27C6:00 27C6:0D53 Touchpad" "libinput Natural Scrolling Enabled" 1
+
+# ─── Autostart ───────────────────────────────────────────────────────
+exec --no-startup-id dex --autostart --environment i3
+exec --no-startup-id xss-lock --transfer-sleep-lock -- i3lock --nofork
+exec --no-startup-id nm-applet
+exec --no-startup-id xcompmgr -c -r 6 -o 0.4 -l -5 -t -5
+exec --no-startup-id dunst
+exec --no-startup-id autorandr --change --default mobile
+exec_always --no-startup-id feh --bg-fill --no-fehbg ~/Pictures/Wallpapers/tokyonight_cosmic.png
+
+# ─── Appearance ──────────────────────────────────────────────────────
+# Gaps
+gaps inner 8
+gaps outer 4
+
+# Borders
+default_border pixel 2
+default_floating_border pixel 2
+hide_edge_borders smart
+
+# Colors              border  bg      text    indicator child_border
+client.focused          #7aa2f7 #1a1b26 #c0caf5 #7dcfff   #7aa2f7
+client.focused_inactive #414868 #1a1b26 #a9b1d6 #414868   #414868
+client.unfocused        #292e42 #1a1b26 #565f89 #292e42   #292e42
+client.urgent           #f7768e #1a1b26 #c0caf5 #f7768e   #f7768e
+client.placeholder      #1a1b26 #1a1b26 #c0caf5 #1a1b26   #1a1b26
+client.background       #1a1b26
+
+# ─── Key Bindings ────────────────────────────────────────────────────
+# Terminal
+bindsym $mod+Return exec $term
+
+# Kill focused window
+bindsym $mod+Shift+q kill
+
+# Application launcher (rofi)
+bindsym $mod+d exec --no-startup-id rofi -show drun -theme ~/.config/rofi/config.rasi
+bindsym $mod+Tab exec --no-startup-id rofi -show window -theme ~/.config/rofi/config.rasi
+
+# Screenshots (flameshot)
+bindsym Print exec --no-startup-id flameshot gui
+bindsym $mod+Print exec --no-startup-id flameshot full -p ~/Pictures
+bindsym $mod+Shift+Print exec --no-startup-id flameshot screen -p ~/Pictures
+
+# Lock screen
+bindsym $mod+Escape exec --no-startup-id i3lock -c 1a1b26
+
+# ─── Audio / Brightness ─────────────────────────────────────────────
+set $refresh_i3status killall -SIGUSR1 i3status
+bindsym XF86AudioRaiseVolume exec --no-startup-id pactl set-sink-volume @DEFAULT_SINK@ +5% && $refresh_i3status
+bindsym XF86AudioLowerVolume exec --no-startup-id pactl set-sink-volume @DEFAULT_SINK@ -5% && $refresh_i3status
+bindsym XF86AudioMute exec --no-startup-id pactl set-sink-mute @DEFAULT_SINK@ toggle && $refresh_i3status
+bindsym XF86AudioMicMute exec --no-startup-id pactl set-source-mute @DEFAULT_SOURCE@ toggle && $refresh_i3status
+
+# ─── Window Management ──────────────────────────────────────────────
+floating_modifier $mod
+tiling_drag modifier titlebar
+
+# Focus (vim-style)
+bindsym $mod+h focus left
+bindsym $mod+j focus down
+bindsym $mod+k focus up
+bindsym $mod+l focus right
+
+# Focus (arrow keys)
+bindsym $mod+Left focus left
+bindsym $mod+Down focus down
+bindsym $mod+Up focus up
+bindsym $mod+Right focus right
+
+# Move window (vim-style)
+bindsym $mod+Shift+h move left
+bindsym $mod+Shift+j move down
+bindsym $mod+Shift+k move up
+bindsym $mod+Shift+l move right
+
+# Move window (arrow keys)
+bindsym $mod+Shift+Left move left
+bindsym $mod+Shift+Down move down
+bindsym $mod+Shift+Up move up
+bindsym $mod+Shift+Right move right
+
+# Split orientation
+bindsym $mod+b split h
+bindsym $mod+v split v
+
+# Fullscreen
+bindsym $mod+f fullscreen toggle
+
+# Layout
+bindsym $mod+s layout stacking
+bindsym $mod+w layout tabbed
+bindsym $mod+e layout toggle split
+
+# Floating
+bindsym $mod+Shift+space floating toggle
+bindsym $mod+space focus mode_toggle
+
+# Parent/child focus
+bindsym $mod+a focus parent
+
+# Scratchpad
+bindsym $mod+Shift+minus move scratchpad
+bindsym $mod+minus scratchpad show
+
+# ─── Gaps Adjustment ────────────────────────────────────────────────
+bindsym $mod+g gaps inner current plus 4
+bindsym $mod+Shift+g gaps inner current minus 4
+bindsym $mod+Ctrl+g gaps inner current set 0
+
+# ─── Workspaces ──────────────────────────────────────────────────────
+set $ws1 "1"
+set $ws2 "2"
+set $ws3 "3"
+set $ws4 "4"
+set $ws5 "5"
+set $ws6 "6"
+set $ws7 "7"
+set $ws8 "8"
+set $ws9 "9"
+set $ws10 "10"
+
+# Switch to workspace
+bindsym $mod+1 workspace number $ws1
+bindsym $mod+2 workspace number $ws2
+bindsym $mod+3 workspace number $ws3
+bindsym $mod+4 workspace number $ws4
+bindsym $mod+5 workspace number $ws5
+bindsym $mod+6 workspace number $ws6
+bindsym $mod+7 workspace number $ws7
+bindsym $mod+8 workspace number $ws8
+bindsym $mod+9 workspace number $ws9
+bindsym $mod+0 workspace number $ws10
+
+# Move container to workspace
+bindsym $mod+Shift+1 move container to workspace number $ws1
+bindsym $mod+Shift+2 move container to workspace number $ws2
+bindsym $mod+Shift+3 move container to workspace number $ws3
+bindsym $mod+Shift+4 move container to workspace number $ws4
+bindsym $mod+Shift+5 move container to workspace number $ws5
+bindsym $mod+Shift+6 move container to workspace number $ws6
+bindsym $mod+Shift+7 move container to workspace number $ws7
+bindsym $mod+Shift+8 move container to workspace number $ws8
+bindsym $mod+Shift+9 move container to workspace number $ws9
+bindsym $mod+Shift+0 move container to workspace number $ws10
+
+# ─── Resize Mode ─────────────────────────────────────────────────────
+mode "resize" {
+        bindsym h resize shrink width 5 px or 5 ppt
+        bindsym j resize grow height 5 px or 5 ppt
+        bindsym k resize shrink height 5 px or 5 ppt
+        bindsym l resize grow width 5 px or 5 ppt
+
+        bindsym Left resize shrink width 5 px or 5 ppt
+        bindsym Down resize grow height 5 px or 5 ppt
+        bindsym Up resize shrink height 5 px or 5 ppt
+        bindsym Right resize grow width 5 px or 5 ppt
+
+        bindsym Return mode "default"
+        bindsym Escape mode "default"
+        bindsym $mod+r mode "default"
+}
+
+bindsym $mod+r mode "resize"
+
+# ─── Floating Rules ──────────────────────────────────────────────────
+for_window [window_role="pop-up"] floating enable
+for_window [window_role="task_dialog"] floating enable
+for_window [class="Pavucontrol"] floating enable
+for_window [class="Nm-connection-editor"] floating enable
+for_window [class="Blueman-manager"] floating enable
+for_window [title="File Transfer*"] floating enable
+
+# ─── i3 Management ───────────────────────────────────────────────────
+bindsym $mod+Shift+c reload
+bindsym $mod+Shift+r restart
+bindsym $mod+Shift+e exec "i3-nagbar -t warning -m 'Exit i3?' -B 'Yes, exit' 'i3-msg exit'"
+
+# ─── Bar ─────────────────────────────────────────────────────────────
+exec_always --no-startup-id ~/.config/polybar/launch.sh
