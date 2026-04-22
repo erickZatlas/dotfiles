@@ -20,68 +20,123 @@ Personal dotfiles managed with [chezmoi](https://www.chezmoi.io/).
 - `.wezterm.lua` - WezTerm terminal configuration
 
 ### i3 Window Manager
-- `i3/config` - i3wm configuration (keybindings, workspaces, appearance)
-- `i3/kb-layout.sh` - Keyboard layout wrapper script (unused, replaced by polybar module)
-- `i3status/config` - i3status configuration (kept as fallback for polybar)
+Central configs and recovery scripts for a bulletproof i3 setup:
+
+- `i3/config` — main keybindings, workspaces, appearance
+- `i3/postswitch.sh` — unified monitor change handler (compositor, polybar, keyboard, cursor, wallpaper)
+- `i3/fix-keyboard.sh` — re-applies `br,us` layout with Alt+Shift toggle
+- `i3/flatten.sh` — flattens the current workspace (resets container nesting)
+- `i3/center-mouse.sh` — warps mouse to focused window center on keyboard focus
+- `i3/gather-workspaces.sh` — gathers all workspaces to the current monitor (after unplug)
+- `i3/move-workspace.sh` — moves current workspace between monitors with compositor restart (prevents ghosting)
+- `i3status/config` — fallback status bar config (polybar is primary)
 
 ### Polybar
-- `polybar/config.ini` - Status bar with Tokyo Night theme
-- `polybar/launch.sh` - Multi-monitor launch script
+- `polybar/config.ini` — Tokyo Night themed status bar with PipeWire/battery/wifi/layout modules
+- `polybar/launch.sh` — multi-monitor launch script with timeout and fallback
+- `polybar/layout.sh` — shows current container layout (H-Split, V-Split, Tabbed, Stacked)
 
 ### Compositor
-- `picom/picom.conf` - Picom configuration (kept as reference, currently using xcompmgr)
+- `picom/picom.conf` — kept for reference. Currently using xcompmgr (lighter on Intel Raptor Lake iGPU)
 
 ### Application Launcher
-- `rofi/config.rasi` - Rofi launcher with Tokyo Night theme
+- `rofi/config.rasi` — Tokyo Night themed Rofi launcher
 
 ### Notifications
-- `dunst/dunstrc` - Dunst notification daemon with Tokyo Night theme
+- `dunst/dunstrc` — Tokyo Night themed notification daemon
 
-### Monitor Management
-- `autorandr/mobile/postswitch` - Restarts compositor when external monitor is unplugged
-- `autorandr/docked/postswitch` - Restarts compositor when external monitor is plugged in
+### Monitor Management (autorandr)
+Three profiles with symlinked postswitch scripts (all point to `i3/postswitch.sh`):
+- `autorandr/mobile/` — laptop only (eDP-1)
+- `autorandr/home/` — external monitor on the left of laptop
+- `autorandr/work/` — external monitor above laptop
 
 ## Desktop environment
 
-The i3 setup uses the **Tokyo Night** color scheme across all components:
+Tokyo Night color scheme across all components:
 
 | Component | Tool | Notes |
 |-----------|------|-------|
-| Window manager | i3wm | Gaps, vim-style navigation |
-| Status bar | Polybar | Keyboard layout, battery, network, audio, etc. |
-| Compositor | xcompmgr | Lightweight shadows (picom caused high CPU on Intel Raptor Lake) |
+| Window manager | i3wm | Gaps, vim-style navigation, container tree model |
+| Status bar | Polybar | Layout indicator, keyboard, battery, wifi, CPU, memory, audio |
+| Compositor | xcompmgr | Lightweight shadows (picom caused high CPU on Intel iGPU) |
 | Launcher | Rofi | App launcher and window switcher |
 | Notifications | Dunst | Styled notification popups |
-| Terminal | WezTerm | GPU-accelerated terminal |
-| Wallpaper | feh | Tokyo Night wallpapers in `~/Pictures/Wallpapers/` |
+| Terminal | WezTerm | GPU-accelerated, Tokyo Night theme |
+| Wallpaper | feh | Wallpapers in `~/Pictures/Wallpapers/` |
 | Monitors | autorandr | Auto-switches profiles on plug/unplug |
+| Audio | PipeWire | Volume keys via `wpctl` |
 
 ### Dependencies
 
 ```bash
-sudo apt install i3 polybar xcompmgr rofi dunst feh autorandr
+sudo apt install i3 polybar xcompmgr rofi dunst feh autorandr xdotool wireplumber
 ```
 
-### Keyboard
+### Essential keybindings
 
-- **Alt+Shift** toggles between `br` (Brazilian Portuguese) and `us` (English) layouts
-- Layout indicator is shown in polybar's `xkeyboard` module
+| Key | Action |
+|-----|--------|
+| `$mod+Return` | Open terminal |
+| `$mod+d` | App launcher (Rofi) |
+| `$mod+h/j/k/l` | Focus left/down/up/right |
+| `$mod+Shift+h/j/k/l` | Move window |
+| `$mod+1-0` | Switch workspace |
+| `$mod+w` | Tab siblings |
+| `$mod+e` | Untab / toggle H/V |
+| `$mod+v` / `$mod+b` | Next window opens below/right |
+
+### Recovery keybindings
+
+| Key | Action |
+|-----|--------|
+| `$mod+Shift+f` | Flatten workspace (fix nesting) |
+| `$mod+Shift+p` | Relaunch polybar (fix missing bar) |
+| `$mod+Ctrl+k` | Re-apply keyboard layout (fix Alt+Shift) |
+| `$mod+o` | Move workspace to other monitor |
+| `$mod+Shift+o` | Gather all workspaces to current monitor |
+
+### Keyboard layouts
+
+`br,us` with Alt+Shift toggle. System-level fix applied to `/etc/default/keyboard` so the setting persists across X11 events.
 
 ### Touchpad
 
-Tap-to-click and natural scrolling are enabled via `xinput` in the i3 config. The device name is hardcoded — adjust if using a different laptop.
+Tap-to-click and natural scrolling enabled via `xinput` in the i3 config. Device name is hardcoded — adjust for different laptops.
+
+### Audio (PipeWire)
+
+Volume keys use `wpctl` (not `pactl`):
+```
+wpctl set-volume @DEFAULT_AUDIO_SINK@ 5%+
+wpctl set-mute @DEFAULT_AUDIO_SINK@ toggle
+```
 
 ### Monitor profiles
 
-Autorandr manages two profiles:
+Autorandr manages three profiles — saved by monitor EDID (hardware fingerprint), auto-detected on plug/unplug:
 
-- **mobile** - Laptop screen only (eDP-1)
-- **docked** - External monitor on the left (HDMI-1) + laptop
+- **mobile** — laptop only
+- **home** — external monitor to the left
+- **work** — external monitor above
 
-Save new profiles with:
+Save a new profile after configuring with `xrandr`:
 ```bash
-autorandr --save <profile-name>
+autorandr --save <profile-name> --force
 ```
+
+All profiles share the same postswitch hook (`i3/postswitch.sh`) that restarts the compositor, relaunches polybar, restores the keyboard layout, fixes the cursor, and restores the wallpaper.
+
+## Documentation
+
+Interactive guides in `~/Documents/`:
+- `i3.html` — unified entry point
+- `i3-cheatsheet.html` — keybindings, containers, concepts, desktop
+- `i3-concepts.html` — container tree model with SVG diagrams
+- `i3-practice.html` — interactive lessons (learn by manipulating a simulated tree)
+
+Terminal helpers:
+- `i3tree` — prints the container tree with focus markers (installed in `~/bin/`)
 
 ## Install
 
