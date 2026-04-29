@@ -7,7 +7,8 @@ if ! pgrep -f ACVC.GTK.Service >/dev/null; then
     exit 0
 fi
 
-if pgrep -x openvpn >/dev/null && ip -br link show type tun 2>/dev/null | grep -q UP; then
+# AWS VPN spawns acvc-openvpn (renamed from openvpn) when actually connected.
+if pgrep -f acvc-openvpn >/dev/null; then
     echo "%{F#9ece6a} VPN%{F-}"
 else
     echo "%{F#565f89} VPN%{F-}"

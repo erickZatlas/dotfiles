@@ -131,10 +131,10 @@ bindsym $mod+Shift+f exec --no-startup-id ~/.config/i3/flatten.sh
 bindsym $mod+Shift+minus move scratchpad
 bindsym $mod+minus scratchpad show
 
-# AWS VPN Client: sticky floating so it follows across all workspaces — needed because
-# the connect flow opens a browser SSO tab and you need both windows reachable at once.
+# AWS VPN Client: sticky floating during the connect flow (browser SSO tab spans
+# workspaces), then $mod+Shift+v toggles to scratchpad once you're connected.
 for_window [class="AWS VPN Client"] floating enable, resize set 500 400, move position center, sticky enable
-bindsym $mod+Shift+v [class="AWS VPN Client"] focus, move position center
+bindsym $mod+Shift+v exec --no-startup-id ~/.config/i3/awsvpn-toggle.sh
 
 # Relaunch polybar
 bindsym $mod+Shift+p exec --no-startup-id ~/.config/polybar/launch.sh
