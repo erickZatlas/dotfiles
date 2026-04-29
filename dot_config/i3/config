@@ -154,6 +154,14 @@ set $ws8 "8"
 set $ws9 "9"
 set $ws10 "10"
 
+# Pin workspaces to outputs (HDMI-1 preferred, eDP-1 fallback when undocked)
+workspace $ws1 output eDP-1
+workspace $ws2 output HDMI-1 eDP-1
+workspace $ws3 output HDMI-1 eDP-1
+workspace $ws4 output HDMI-1 eDP-1
+workspace $ws5 output HDMI-1 eDP-1
+workspace $ws6 output HDMI-1 eDP-1
+
 # Switch to workspace
 bindsym $mod+1 workspace number $ws1
 bindsym $mod+2 workspace number $ws2
