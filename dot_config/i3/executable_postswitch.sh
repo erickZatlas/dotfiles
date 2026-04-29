@@ -8,10 +8,9 @@ flock -n 200 || exit 0
 
 sleep 2
 
-# Restart compositor
+# No compositor: picom and xcompmgr both produce stale-frame artifacts on this machine after KVM/monitor swaps.
 pkill xcompmgr 2>/dev/null
-sleep 1
-xcompmgr -c -C -r 6 -o 0.4 -l -5 -t -5 &
+pkill picom 2>/dev/null
 
 # Wait for monitors to be fully ready, then relaunch polybar
 sleep 1
