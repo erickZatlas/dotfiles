@@ -131,6 +131,10 @@ bindsym $mod+Shift+f exec --no-startup-id ~/.config/i3/flatten.sh
 bindsym $mod+Shift+minus move scratchpad
 bindsym $mod+minus scratchpad show
 
+# AWS VPN Client lives in scratchpad — summon with $mod+Shift+v, hide on summon-toggle
+for_window [class="AWS VPN Client"] move scratchpad
+bindsym $mod+Shift+v [class="AWS VPN Client"] scratchpad show, move position center
+
 # Relaunch polybar
 bindsym $mod+Shift+p exec --no-startup-id ~/.config/polybar/launch.sh
 
