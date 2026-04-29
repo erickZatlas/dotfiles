@@ -131,11 +131,10 @@ bindsym $mod+Shift+f exec --no-startup-id ~/.config/i3/flatten.sh
 bindsym $mod+Shift+minus move scratchpad
 bindsym $mod+minus scratchpad show
 
-# AWS VPN Client: pin to ws 1 (which lives on eDP-1, never migrates between outputs)
-# and force re-center on appearance to dodge the floating-coord-drift after monitor changes.
-assign [class="AWS VPN Client"] → 1
-for_window [class="AWS VPN Client"] floating enable, resize set 500 400, move position center
-bindsym $mod+Shift+v [class="AWS VPN Client"] focus
+# AWS VPN Client: sticky floating so it follows across all workspaces — needed because
+# the connect flow opens a browser SSO tab and you need both windows reachable at once.
+for_window [class="AWS VPN Client"] floating enable, resize set 500 400, move position center, sticky enable
+bindsym $mod+Shift+v [class="AWS VPN Client"] focus, move position center
 
 # Relaunch polybar
 bindsym $mod+Shift+p exec --no-startup-id ~/.config/polybar/launch.sh
