@@ -131,9 +131,11 @@ bindsym $mod+Shift+f exec --no-startup-id ~/.config/i3/flatten.sh
 bindsym $mod+Shift+minus move scratchpad
 bindsym $mod+minus scratchpad show
 
-# AWS VPN Client lives in scratchpad — summon with $mod+Shift+v, hide on summon-toggle
-for_window [class="AWS VPN Client"] move scratchpad
-bindsym $mod+Shift+v [class="AWS VPN Client"] scratchpad show, move position center
+# AWS VPN Client: pin to ws 1 (which lives on eDP-1, never migrates between outputs)
+# and force re-center on appearance to dodge the floating-coord-drift after monitor changes.
+assign [class="AWS VPN Client"] → 1
+for_window [class="AWS VPN Client"] floating enable, resize set 500 400, move position center
+bindsym $mod+Shift+v [class="AWS VPN Client"] focus
 
 # Relaunch polybar
 bindsym $mod+Shift+p exec --no-startup-id ~/.config/polybar/launch.sh
