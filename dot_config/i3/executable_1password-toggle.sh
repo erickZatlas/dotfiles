@@ -2,7 +2,7 @@
 # Toggle 1Password window: hide-if-visible, summon-if-hidden, launch-if-not-running.
 
 # If the agent isn't running yet, launch it and exit. The for_window rule will catch the window.
-if ! pgrep -f "/opt/1Password/1password --silent" >/dev/null; then
+if ! pgrep -x 1password >/dev/null; then
     nohup 1password >/dev/null 2>&1 & disown
     exit 0
 fi
