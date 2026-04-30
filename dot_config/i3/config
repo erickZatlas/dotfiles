@@ -13,6 +13,7 @@ exec --no-startup-id dex --autostart --environment i3
 exec --no-startup-id xss-lock --transfer-sleep-lock -- i3lock --nofork
 exec --no-startup-id nm-applet
 exec --no-startup-id dunst
+exec --no-startup-id /usr/lib/policykit-1-gnome/polkit-gnome-authentication-agent-1
 
 # Input: keyboard layout, touchpad, cursor
 exec --no-startup-id setxkbmap -layout br,us -option grp:alt_shift_toggle
