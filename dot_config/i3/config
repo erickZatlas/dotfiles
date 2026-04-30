@@ -136,6 +136,10 @@ bindsym $mod+minus scratchpad show
 for_window [class="AWS VPN Client"] floating enable, resize set 500 400, move position center, sticky enable
 bindsym $mod+Shift+v exec --no-startup-id ~/.config/i3/awsvpn-toggle.sh
 
+# 1Password: same pattern as AWS VPN — sticky-visible while you need it, scratchpad otherwise.
+for_window [class="1Password"] floating enable, resize set 900 700, move position center, sticky enable
+bindsym $mod+p exec --no-startup-id ~/.config/i3/1password-toggle.sh
+
 # Relaunch polybar
 bindsym $mod+Shift+p exec --no-startup-id ~/.config/polybar/launch.sh
 
