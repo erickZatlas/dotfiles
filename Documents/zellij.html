@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>i3wm Guide</title>
+<title>Zellij Guide</title>
 <style>
 *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 body {
@@ -122,59 +122,56 @@ footer {
 <body>
 
 <div class="container">
-  <h1>i3wm</h1>
-  <p class="subtitle">Your tiling window manager guide</p>
+  <h1>Zellij</h1>
+  <p class="subtitle">Terminal workspace &middot; sessions, tabs, panes, and persistence</p>
 
   <div class="cards">
-    <a class="card" href="i3-cheatsheet.html">
+    <a class="card" href="zellij-cheatsheet.html">
       <div class="card-icon">&#x2328;</div>
       <span class="card-title">Cheatsheet</span>
-      <span class="card-desc">Keybindings, containers, concepts, and desktop settings</span>
+      <span class="card-desc">Every mode, keybind, CLI flag, and layout option in one tabbed page</span>
     </a>
 
-    <a class="card" href="i3-concepts.html">
+    <a class="card" href="zellij-concepts.html">
       <div class="card-icon">&#x1F333;</div>
       <span class="card-title">Concepts</span>
-      <span class="card-desc">Deep dive into the container tree model with SVG diagrams</span>
+      <span class="card-desc">Sessions, the modal keybind state machine, layouts, persistence</span>
     </a>
 
-    <a class="card" href="i3-practice.html">
+    <a class="card" href="zellij-practice.html">
       <div class="card-icon">&#x1F3AE;</div>
       <span class="card-title">Practice</span>
-      <span class="card-desc">Interactive exercises — manipulate the tree and learn by doing</span>
+      <span class="card-desc">Drive a simulated session — split panes, switch modes, learn by doing</span>
     </a>
 
-    <a class="card" href="https://i3wm.org/docs/userguide.html" target="_blank">
+    <a class="card" href="https://zellij.dev/documentation/" target="_blank">
       <div class="card-icon">&#x1F4D6;</div>
-      <span class="card-title">i3 Docs</span>
-      <span class="card-desc">Official i3 user guide and reference</span>
+      <span class="card-title">Zellij Docs</span>
+      <span class="card-desc">Official Zellij documentation and reference</span>
     </a>
   </div>
 
   <div class="quick-ref">
     <h2>Survival kit</h2>
     <table>
-      <tr><td>$mod+Return</td><td>Open terminal</td></tr>
-      <tr><td>$mod+d</td><td>App launcher (Rofi)</td></tr>
-      <tr><td>$mod+Shift+q</td><td>Close window</td></tr>
-      <tr><td>$mod+h/j/k/l</td><td>Focus left/down/up/right</td></tr>
-      <tr><td>$mod+1-0</td><td>Switch workspace</td></tr>
-      <tr><td>$mod+w</td><td>Tab siblings</td></tr>
-      <tr><td>$mod+e</td><td>Untab / toggle H/V</td></tr>
-      <tr><td>$mod+v</td><td>Next window opens below</td></tr>
-      <tr><td>$mod+Shift+f</td><td>Flatten workspace</td></tr>
-      <tr><td>$mod+Shift+p</td><td>Fix polybar (if missing)</td></tr>
-      <tr><td>$mod+Ctrl+k</td><td>Fix keyboard layout (if Alt+Shift broken)</td></tr>
-      <tr><td>$mod+o</td><td>Move current workspace to the other monitor</td></tr>
-      <tr><td>$mod+Shift+o</td><td>Gather all workspaces to current monitor</td></tr>
-      <tr><td>auto</td><td>ws 2–6 pinned to external (HDMI-1 / DP-1), ws 1 stays on laptop — see i3 config <code>workspace … output</code> block</td></tr>
-      <tr><td>$mod+Shift+v</td><td>Toggle AWS VPN window: sticky-visible ↔ hidden in scratchpad</td></tr>
-      <tr><td>polybar VPN icon</td><td>Same toggle as $mod+Shift+v. Green = connected, gray = disconnected, red = service down.</td></tr>
-      <tr><td>i3tree</td><td>Show container tree (terminal)</td></tr>
+      <tr><td>zellij</td><td>Start or attach to default session</td></tr>
+      <tr><td>zellij -s NAME</td><td>Start a named session</td></tr>
+      <tr><td>zellij attach NAME</td><td>Re-attach to a session (after detach / wezterm close)</td></tr>
+      <tr><td>zellij --layout dev</td><td>Start with the dev layout (editor + shell + logs)</td></tr>
+      <tr><td>zellij ls</td><td>List sessions</td></tr>
+      <tr><td>zellij kill-session NAME</td><td>End a session</td></tr>
+      <tr><td>Alt+p then n / x / arrows</td><td>PANE mode &mdash; new / close / focus pane (rebound from Ctrl+P so nvim's <code>&lt;C-p&gt;</code> still works)</td></tr>
+      <tr><td>Ctrl+T then n / 1-9</td><td>TAB mode &mdash; new tab / jump to tab</td></tr>
+      <tr><td>Alt+h / Alt+l</td><td>Previous / next zellij tab. Wezterm tabs are on Ctrl+Alt+H / Ctrl+Alt+L. Ctrl+H/L pass through to nvim &amp; bash.</td></tr>
+      <tr><td>Ctrl+S</td><td>SCROLL mode &mdash; PgUp / PgDn / / to search</td></tr>
+      <tr><td>Alt+o then d</td><td>SESSION mode &rarr; detach (rebound from Ctrl+O so nvim's <code>&lt;C-o&gt;</code> jumplist still works)</td></tr>
+      <tr><td>Ctrl+G</td><td>Lock zellij (forward all keys to the running app)</td></tr>
+      <tr><td>Ctrl+Q</td><td>Quit zellij and kill the session</td></tr>
+      <tr><td>config</td><td><code>~/.config/zellij/config.kdl</code> &middot; layouts under <code>layouts/</code></td></tr>
     </table>
   </div>
 
-  <footer>Tokyo Night &middot; i3wm + Polybar + xcompmgr + WezTerm + Zellij &middot; <a href="zellij.html" style="color:#7aa2f7">zellij guide &rarr;</a></footer>
+  <footer>Tokyo Night &middot; Zellij 0.44 &middot; on i3wm + WezTerm</footer>
 </div>
 
 </body>

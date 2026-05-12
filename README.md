@@ -19,6 +19,16 @@ Personal dotfiles managed with [chezmoi](https://www.chezmoi.io/).
 - `.ideavimrc` - IdeaVim plugin configuration for IntelliJ IDEA
 - `.wezterm.lua` - WezTerm terminal configuration
 
+### Terminal multiplexer (Zellij)
+- `.config/zellij/config.kdl` — main config (theme, persistence, keybind overrides)
+- `.config/zellij/layouts/dev.kdl` — dev layout (editor + shell + logs)
+
+Keybind overrides vs. zellij defaults:
+- `Ctrl+P` → unbound (so nvim's `<C-p>` reaches the editor); PANE mode on `Alt+p`
+- `Ctrl+O` → unbound (so nvim's `<C-o>` jumplist reaches the editor); SESSION mode on `Alt+o`
+- `Alt+h` / `Alt+l` → zellij tab prev/next (overrides default MoveFocusOrTab; that behavior moves to `Alt+arrow`)
+- `Ctrl+H` / `Ctrl+L` → pass through to nvim window-direction and bash backspace/clear-screen
+
 ### i3 Window Manager
 Central configs and recovery scripts for a bulletproof i3 setup:
 
@@ -63,6 +73,7 @@ Tokyo Night color scheme across all components:
 | Launcher | Rofi | App launcher and window switcher |
 | Notifications | Dunst | Styled notification popups |
 | Terminal | WezTerm | GPU-accelerated, Tokyo Night theme |
+| Multiplexer | Zellij | Persistent sessions, modal keybinds, layout templates |
 | Wallpaper | feh | Wallpapers in `~/Pictures/Wallpapers/` |
 | Monitors | autorandr | Auto-switches profiles on plug/unplug |
 | Audio | PipeWire | Volume keys via `wpctl` |
@@ -71,6 +82,12 @@ Tokyo Night color scheme across all components:
 
 ```bash
 sudo apt install i3 polybar xcompmgr rofi dunst feh autorandr xdotool wireplumber
+```
+
+Zellij isn't in apt — install from the official GitHub release:
+```bash
+curl -fsSL https://github.com/zellij-org/zellij/releases/latest/download/zellij-x86_64-unknown-linux-musl.tar.gz \
+  | tar -xz -C /tmp && install -m 0755 /tmp/zellij ~/.local/bin/zellij
 ```
 
 ### Essential keybindings
@@ -85,6 +102,28 @@ sudo apt install i3 polybar xcompmgr rofi dunst feh autorandr xdotool wireplumbe
 | `$mod+w` | Tab siblings |
 | `$mod+e` | Untab / toggle H/V |
 | `$mod+v` / `$mod+b` | Next window opens below/right |
+
+### Wezterm keybindings (subset)
+
+| Key | Action |
+|-----|--------|
+| `Ctrl+Alt+H` / `Ctrl+Alt+L` | Previous / next wezterm tab |
+| `Ctrl+Shift+H/J/K/L` | Wezterm pane direction |
+| `Ctrl+Shift+D` / `Ctrl+Shift+R` | Wezterm pane split horizontal / vertical |
+| `Ctrl+Shift+W` | Close wezterm pane |
+
+### Zellij keybindings
+
+| Key | Action |
+|-----|--------|
+| `Alt+p` then `n / r / d / x` | PANE mode — new / split right / split down / close |
+| `Ctrl+T` then `n / 1-9` | TAB mode — new tab / jump to tab |
+| `Alt+h` / `Alt+l` | Zellij tab prev / next |
+| `Alt+arrow` | Pane focus (crosses tab edge — MoveFocusOrTab) |
+| `Ctrl+S` then `j/k/PgUp/PgDn` | SCROLL mode |
+| `Alt+o` then `d` | SESSION mode → detach |
+| `Ctrl+G` | LOCKED — pass every key through to the inner program |
+| `Ctrl+Q` | Quit zellij and kill the session (use detach instead) |
 
 ### Recovery keybindings
 
@@ -130,10 +169,14 @@ All profiles share the same postswitch hook (`i3/postswitch.sh`) that restarts t
 ## Documentation
 
 Interactive guides in `~/Documents/`:
-- `i3.html` — unified entry point
-- `i3-cheatsheet.html` — keybindings, containers, concepts, desktop
-- `i3-concepts.html` — container tree model with SVG diagrams
-- `i3-practice.html` — interactive lessons (learn by manipulating a simulated tree)
+- `i3.html` — i3wm entry point
+- `i3-cheatsheet.html` — i3 keybindings, containers, concepts, desktop
+- `i3-concepts.html` — i3 container tree model with SVG diagrams
+- `i3-practice.html` — i3 interactive lessons (learn by manipulating a simulated tree)
+- `zellij.html` — zellij entry point
+- `zellij-cheatsheet.html` — zellij modes, CLI, config, layouts, sessions
+- `zellij-concepts.html` — sessions/tabs/panes hierarchy, mode state machine, persistence model, key-conflict analysis
+- `zellij-practice.html` — zellij interactive lessons (drive a simulated session)
 
 Terminal helpers:
 - `i3tree` — prints the container tree with focus markers (installed in `~/bin/`)

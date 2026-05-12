@@ -284,9 +284,9 @@ config.mouse_bindings = {
 -- Keybindings
 -- ==========================================================
 config.keys = {
-  -- Tab navigation
-  { key = "h", mods = "CTRL", action = act.ActivateTabRelative(-1) },
-  { key = "l", mods = "CTRL", action = act.ActivateTabRelative(1) },
+  -- Tab navigation. Ctrl+H/L freed for zellij + nvim window-direction.
+  { key = "h", mods = "CTRL|ALT", action = act.ActivateTabRelative(-1) },
+  { key = "l", mods = "CTRL|ALT", action = act.ActivateTabRelative(1) },
 
   -- Pane splits
   { key = "d", mods = "CTRL|SHIFT", action = act.SplitHorizontal({ domain = "CurrentPaneDomain" }) },
