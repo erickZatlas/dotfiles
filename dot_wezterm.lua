@@ -162,7 +162,7 @@ wezterm.on("format-tab-title", function(tab)
 end)
 
 -- ==========================================================
--- Right-side status bar: git branch, hostname, time
+-- Right-side status bar: workspace, cwd, hostname
 -- ==========================================================
 wezterm.on("update-right-status", function(window, pane)
   local cwd_uri = pane:get_current_working_dir()
@@ -174,7 +174,6 @@ wezterm.on("update-right-status", function(window, pane)
     cwd = cwd_uri.file_path:match("([^/]+)$") or cwd_uri.file_path
   end
 
-  local date = wezterm.strftime("%H:%M  %a %b %-d")
   local workspace = window:active_workspace()
 
   local status = {}
@@ -194,12 +193,8 @@ wezterm.on("update-right-status", function(window, pane)
   -- Hostname (useful for SSH)
   if #hostname > 0 and hostname ~= "localhost" then
     table.insert(status, { Foreground = { Color = "#f7768e" } })
-    table.insert(status, { Text = wezterm.nerdfonts.md_server .. " " .. hostname .. "  " })
+    table.insert(status, { Text = wezterm.nerdfonts.md_server .. " " .. hostname .. " " })
   end
-
-  -- Date/time
-  table.insert(status, { Foreground = { Color = "#9ece6a" } })
-  table.insert(status, { Text = wezterm.nerdfonts.md_clock_outline .. " " .. date .. " " })
 
   window:set_right_status(wezterm.format(status))
 end)
