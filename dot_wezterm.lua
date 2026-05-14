@@ -85,22 +85,10 @@ config.colors = {
 }
 
 -- ==========================================================
--- Tab title: show process name + CWD
+-- Tab title: show process name (CWD lives in right-side status)
 -- ==========================================================
-local function tab_title(tab)
-  local title = tab.tab_title
-  if not title or #title == 0 then
-    local pane = tab.active_pane
-    local process = pane.foreground_process_name:match("([^/\\]+)$") or ""
-    local cwd = pane.current_working_dir
-    if cwd then
-      local dir = cwd.file_path:match("([^/]+)$") or cwd.file_path
-      title = process .. " " .. dir
-    else
-      title = process
-    end
-  end
-  return " " .. (tab.tab_index + 1) .. ": " .. title .. " "
+local function tab_process(pane)
+  return pane.foreground_process_name:match("([^/\\]+)$") or ""
 end
 
 -- Process icons for tab title
@@ -137,8 +125,6 @@ end
 
 wezterm.on("format-tab-title", function(tab)
   local pane = tab.active_pane
-  local process = pane.foreground_process_name:match("([^/\\]+)$") or ""
-  local icon = process_icons[process] or wezterm.nerdfonts.cod_terminal
   local state = claude_state(pane.pane_id)
 
   -- Respect manually-set tab title (via OSC 1 / tabtitle command)
@@ -157,43 +143,32 @@ wezterm.on("format-tab-title", function(tab)
     end
   end
 
-  local title = tab_title(tab)
-  return { { Text = state .. icon .. title } }
+  local process = tab_process(pane)
+  local icon = process_icons[process] or wezterm.nerdfonts.cod_terminal
+  return { { Text = state .. icon .. " " .. process .. " " } }
 end)
 
 -- ==========================================================
--- Right-side status bar: workspace, cwd, hostname
+-- Right-side status bar: workspace + CWD
 -- ==========================================================
 wezterm.on("update-right-status", function(window, pane)
-  local cwd_uri = pane:get_current_working_dir()
-  local hostname = ""
-  local cwd = ""
-
-  if cwd_uri then
-    hostname = cwd_uri.host or ""
-    cwd = cwd_uri.file_path:match("([^/]+)$") or cwd_uri.file_path
-  end
-
   local workspace = window:active_workspace()
+  local cwd_uri = pane:get_current_working_dir()
+  local cwd = ""
+  if cwd_uri then
+    cwd = cwd_uri.file_path:match("([^/]+)/?$") or cwd_uri.file_path
+  end
 
   local status = {}
 
-  -- Workspace indicator
   if workspace ~= "default" then
     table.insert(status, { Foreground = { Color = "#bb9af7" } })
     table.insert(status, { Text = wezterm.nerdfonts.cod_window .. " " .. workspace .. "  " })
   end
 
-  -- CWD
   if #cwd > 0 then
     table.insert(status, { Foreground = { Color = "#7aa2f7" } })
     table.insert(status, { Text = wezterm.nerdfonts.md_folder .. " " .. cwd .. "  " })
-  end
-
-  -- Hostname (useful for SSH)
-  if #hostname > 0 and hostname ~= "localhost" then
-    table.insert(status, { Foreground = { Color = "#f7768e" } })
-    table.insert(status, { Text = wezterm.nerdfonts.md_server .. " " .. hostname .. " " })
   end
 
   window:set_right_status(wezterm.format(status))
