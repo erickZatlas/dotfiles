@@ -45,6 +45,14 @@ Central configs and recovery scripts for a bulletproof i3 setup:
 - `polybar/config.ini` — Tokyo Night themed status bar with PipeWire/battery/wifi/layout modules
 - `polybar/launch.sh` — multi-monitor launch script with timeout and fallback
 - `polybar/layout.sh` — shows current container layout (H-Split, V-Split, Tabbed, Stacked)
+- `polybar/scripts/bluetooth-status.sh` — bluetooth indicator: red (service down), grey (off), cyan (idle), green with device name (connected)
+- `polybar/scripts/awsvpn-status.sh` — AWS VPN connection status
+- `polybar/scripts/1password-status.sh` — 1Password agent status
+
+Polybar click handlers route through scripts in `i3/`:
+- BT module → left: `blueman-manager`, right: `i3/bluetooth-toggle.sh` (power toggle)
+- AWS VPN module → left: `i3/awsvpn-toggle.sh`
+- 1Password module → left: `i3/1password-toggle.sh`
 
 ### Compositor
 - `picom/picom.conf` — kept for reference. Currently using xcompmgr (lighter on Intel Raptor Lake iGPU)
@@ -54,6 +62,32 @@ Central configs and recovery scripts for a bulletproof i3 setup:
 
 ### Notifications
 - `dunst/dunstrc` — Tokyo Night themed notification daemon
+
+### AirPods (LibrePods + snixembed)
+
+ANC switching, ear-detection auto-pause, and per-pod battery on Linux. Not chezmoi-tracked (binaries live in `~/bin/` and `~/.local/share/`), but the i3/polybar wiring is:
+
+- `i3/config` → autostarts `snixembed --fork` (must come before any tray app) and `~/bin/librepods`
+- `i3/bluetooth-toggle.sh` — polybar right-click power toggle
+- `polybar/scripts/bluetooth-status.sh` — polybar indicator
+
+**snixembed** (`~/.local/bin/snixembed`) bridges modern `StatusNotifierItem` apps to polybar's older XEmbed tray. Not packaged for Ubuntu — built from source:
+```bash
+sudo apt install valac libgtk-3-dev libdbusmenu-gtk3-dev
+git clone https://git.sr.ht/~steef/snixembed /tmp/snixembed
+cd /tmp/snixembed && make && cp snixembed ~/.local/bin/
+```
+
+**LibrePods** (`~/bin/librepods` → wrapper around `~/.local/share/librepods/AppRun`). The Rust rewrite ships only as an AppImage from `ci-linux-rust.yml` CI artifacts. Ubuntu 24.04 dropped `libfuse2` so the AppImage is extracted, not run directly:
+```bash
+gh run download <LATEST_RUN_ID> --repo kavishdevar/librepods --name librepods-x86_64.AppImage
+chmod +x librepods-x86_64.AppImage
+./librepods-x86_64.AppImage --appimage-extract
+mv squashfs-root ~/.local/share/librepods
+```
+The launcher wrapper at `~/bin/librepods` forces `LIBGL_ALWAYS_SOFTWARE=1 WGPU_BACKENDS=gl` — Iced/wgpu ghosts on Intel + NVIDIA Optimus without it.
+
+Pair AirPods via `blueman-manager` (left-click the polybar BT indicator). LibrePods picks them up automatically once paired.
 
 ### Monitor Management (autorandr)
 Three profiles with symlinked postswitch scripts (all point to `i3/postswitch.sh`):
@@ -77,12 +111,18 @@ Tokyo Night color scheme across all components:
 | Wallpaper | feh | Wallpapers in `~/Pictures/Wallpapers/` |
 | Monitors | autorandr | Auto-switches profiles on plug/unplug |
 | Audio | PipeWire | Volume keys via `wpctl` |
+| Bluetooth | BlueZ + blueman | GUI via `blueman-manager`; polybar indicator + power toggle |
+| Tray bridge | snixembed | StatusNotifierItem → XEmbed for polybar (Vala, built from source) |
+| AirPods | LibrePods (Rust) | ANC modes, ear detection, battery — software rendering forced for Optimus |
 
 ### Dependencies
 
 ```bash
-sudo apt install i3 polybar xcompmgr rofi dunst feh autorandr xdotool wireplumber
+sudo apt install i3 polybar xcompmgr rofi dunst feh autorandr xdotool wireplumber \
+                 blueman valac libgtk-3-dev libdbusmenu-gtk3-dev
 ```
+
+(The last three are build deps for `snixembed`; see the AirPods section.)
 
 Zellij isn't in apt — install from the official GitHub release:
 ```bash
