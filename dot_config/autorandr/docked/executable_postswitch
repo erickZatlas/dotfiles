@@ -1,5 +1,0 @@
-#!/bin/bash
-# Restart xcompmgr cleanly after monitor connect
-pkill -9 xcompmgr
-sleep 1
-xcompmgr -c -r 6 -o 0.4 -l -5 -t -5 &

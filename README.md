@@ -283,11 +283,15 @@ All profiles share the same postswitch hook (`i3/postswitch.sh`) that restarts t
 
 ## Documentation
 
-Interactive guides in `~/Documents/`:
+Interactive guides in `~/Documents/`, grouped by tool:
+
+`~/Documents/i3/`:
 - `i3.html` — i3wm entry point
 - `i3-cheatsheet.html` — i3 keybindings, containers, concepts, desktop
 - `i3-concepts.html` — i3 container tree model with SVG diagrams
 - `i3-practice.html` — i3 interactive lessons (learn by manipulating a simulated tree)
+
+`~/Documents/zellij/`:
 - `zellij.html` — zellij entry point
 - `zellij-cheatsheet.html` — zellij modes, CLI, config, layouts, sessions
 - `zellij-concepts.html` — sessions/tabs/panes hierarchy, mode state machine, persistence model, key-conflict analysis
