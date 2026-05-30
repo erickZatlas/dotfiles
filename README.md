@@ -69,6 +69,11 @@ op item get 'Bash Secrets' --vault=Dev --format=json \
 - `.wezterm.lua` - WezTerm terminal configuration
 - `.config/starship.toml` - Starship shell prompt (see below)
 
+> **Neovim** is *not* tracked here — it lives in its own repo at
+> [`erickZatlas/neovim-config`](https://github.com/erickZatlas/neovim-config)
+> (cloned to `~/.config/nvim`). Kept separate because its Lazy `lazy-lock.json`
+> lifecycle and nested git repo don't play well inside chezmoi.
+
 ### Shell prompt (Starship)
 
 Cross-shell prompt rendered from `.config/starship.toml`. Layout:
