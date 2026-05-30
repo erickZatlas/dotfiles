@@ -18,6 +18,20 @@ Personal dotfiles managed with [chezmoi](https://www.chezmoi.io/).
 - `.gitconfig` - Git configuration with aliases and LFS setup
 - `.ideavimrc` - IdeaVim plugin configuration for IntelliJ IDEA
 - `.wezterm.lua` - WezTerm terminal configuration
+- `.config/starship.toml` - Starship shell prompt (see below)
+
+### Shell prompt (Starship)
+
+Cross-shell prompt rendered from `.config/starship.toml`. Layout:
+
+- **Left:** directory (`🏡` for home, truncated to repo root) → git branch → git status → kotlin → java → nodejs → `➜` (green) / `✗` (red on failure)
+- **Right:** command duration (only if the command ran >2s) → `HH:MM` clock
+
+Notable settings:
+- `command_timeout = 1000` — drops any module that takes >1s, so large git repos never stall the prompt
+- `git_status` and `kotlin`/`java` modules enabled (version shown only inside relevant projects)
+- `package`, `git_commit`, `aws`, `python` disabled to cut clutter
+- Uses ANSI color names, so it adapts to the active WezTerm theme rather than hard-coded hex
 
 ### Terminal multiplexer (Zellij)
 - `.config/zellij/config.kdl` — main config (theme, persistence, keybind overrides)
@@ -107,6 +121,7 @@ Tokyo Night color scheme across all components:
 | Launcher | Rofi | App launcher and window switcher |
 | Notifications | Dunst | Styled notification popups |
 | Terminal | WezTerm | GPU-accelerated, Tokyo Night theme |
+| Shell prompt | Starship | Git/Kotlin/Java context, right-aligned duration + clock |
 | Multiplexer | Zellij | Persistent sessions, modal keybinds, layout templates |
 | Wallpaper | feh | Wallpapers in `~/Pictures/Wallpapers/` |
 | Monitors | autorandr | Auto-switches profiles on plug/unplug |
@@ -128,6 +143,12 @@ Zellij isn't in apt — install from the official GitHub release:
 ```bash
 curl -fsSL https://github.com/zellij-org/zellij/releases/latest/download/zellij-x86_64-unknown-linux-musl.tar.gz \
   | tar -xz -C /tmp && install -m 0755 /tmp/zellij ~/.local/bin/zellij
+```
+
+Starship (shell prompt) — install the binary, then add the init hook to `.bashrc` (already wired in this repo's `.bashrc`):
+```bash
+curl -sS https://starship.rs/install.sh | sh
+# .bashrc: eval "$(starship init bash)"
 ```
 
 ### Essential keybindings
