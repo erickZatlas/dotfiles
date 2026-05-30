@@ -33,3 +33,10 @@ alias tracker='/home/erick/dev/projects/personal/bimester-tracker/.venv/bin/trac
 alias jt='java -jar /home/erick/dev/projects/personal/jvm-test-daemon/jtd-cli/build/libs/jtd.jar'
 
 alias fd=fdfind
+alias fda='fdfind --no-ignore --hidden'
+alias awscli='python /home/erick/dev/projects/zatlas/zatlas-commands/python/update_aws_credentials.py'
+
+alias claude-mem='/home/erick/.bun/bin/bun "/home/erick/.claude/plugins/marketplaces/thedotmack/plugin/scripts/worker-service.cjs"'
+
+# Set WezTerm tab title (usable by Claude Code or manually)
+alias tabtitle='wezterm cli set-tab-title'

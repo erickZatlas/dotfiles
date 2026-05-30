@@ -27,12 +27,21 @@ load_secrets() {
 
 load_secrets
 
+. "$HOME/.cargo/env"
+
+# bun
+export BUN_INSTALL="$HOME/.bun"
+PATH="$BUN_INSTALL/bin:$PATH"
+
 # Additional paths
 path_extras=(
+  "/home/erick/.local/bin"
   "/usr/local/go/bin"
   "/opt/nvim-linux-x86_64/bin"
   "$HOME/.pulumi/bin"
   "$HOME/dev/tools/jira-cli"
+  "$HOME/dev/projects/zatlas/zatlas-claude-toolkit/scripts/cdp"
+  "$HOME/dev/projects/zatlas/zatlas-claude-toolkit/scripts/jira"
 )
 
 for p in "${path_extras[@]}"; do

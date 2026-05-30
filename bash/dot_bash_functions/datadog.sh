@@ -165,16 +165,45 @@ dddash() {
   esac
 }
 
+# Usage:
+#   ddlogs "<query>" [timeframe] [limit]
+#
+# Timeframe formats:
+#   Relative:  "1h", "30m", "7d"              (from now-X to now)
+#   Absolute:  "2026-02-25 TO 2026-03-05"     (ISO dates, UTC)
+#   From-only: "2026-02-25"                    (from date to now)
+#
+# Examples:
+#   ddlogs "service:pms-middleware 9703900" "1h" 20
+#   ddlogs "service:pms-middleware 9703900" "2026-02-25 TO 2026-03-05" 50
+#   ddlogs "service:zatlas-mono 2387206222" "2026-02-25" 30
 ddlogs() {
   local query="${1:-*}"
   local timeframe="${2:-1h}"
   local limit="${3:-20}"
 
+  local from_ts to_ts
+  if [[ "$timeframe" == *" TO "* ]]; then
+    # Absolute range: "2026-02-25 TO 2026-03-05"
+    local from_date="${timeframe%% TO *}"
+    local to_date="${timeframe##* TO }"
+    from_ts="${from_date}T00:00:00Z"
+    to_ts="${to_date}T23:59:59Z"
+  elif [[ "$timeframe" =~ ^[0-9]{4}-[0-9]{2}-[0-9]{2}$ ]]; then
+    # Single date: "2026-02-25" (from that date to now)
+    from_ts="${timeframe}T00:00:00Z"
+    to_ts="now"
+  else
+    # Relative: "1h", "30m", "7d"
+    from_ts="now-$timeframe"
+    to_ts="now"
+  fi
+
   curl -s -X POST "https://api.datadoghq.com/api/v2/logs/events/search" \
     -H "DD-API-KEY: $DATADOG_API_KEY" \
     -H "DD-APPLICATION-KEY: $DATADOG_APP_KEY" \
     -H "Content-Type: application/json" \
-    -d "{\"filter\": {\"query\": \"$query\", \"from\": \"now-$timeframe\", \"to\": \"now\"}, \"page\": {\"limit\": $limit}}" \
+    -d "{\"filter\": {\"query\": \"$query\", \"from\": \"$from_ts\", \"to\": \"$to_ts\"}, \"page\": {\"limit\": $limit}}" \
     | jq -r '.data[]? | "\(.attributes.timestamp) | \(.attributes.message // .attributes.attributes.message // "no message")[0:200]"'
 }
 

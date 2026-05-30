@@ -114,18 +114,13 @@ if command -v direnv &> /dev/null; then
     eval "$(direnv hook bash)"
 fi
 
-#THIS MUST BE AT THE END OF THE FILE FOR SDKMAN TO WORK!!!
-export SDKMAN_DIR="$HOME/.sdkman"
-[[ -s "$HOME/.sdkman/bin/sdkman-init.sh" ]] && source "$HOME/.sdkman/bin/sdkman-init.sh"
-
-# Created by `pipx` on 2025-11-04 19:03:28
-export PATH="$PATH:/home/erick/.local/bin"
-
 # The next line updates PATH for the Google Cloud SDK.
 if [ -f '/home/erick/google-cloud-sdk/path.bash.inc' ]; then . '/home/erick/google-cloud-sdk/path.bash.inc'; fi
 
 # The next line enables shell command completion for gcloud.
 if [ -f '/home/erick/google-cloud-sdk/completion.bash.inc' ]; then . '/home/erick/google-cloud-sdk/completion.bash.inc'; fi
 
-# add Pulumi to the PATH
-export PATH=$PATH:/home/erick/.pulumi/bin
+#THIS MUST BE AT THE END OF THE FILE FOR SDKMAN TO WORK!!!
+export SDKMAN_DIR="$HOME/.sdkman"
+[[ -s "$HOME/.sdkman/bin/sdkman-init.sh" ]] && source "$HOME/.sdkman/bin/sdkman-init.sh"
+

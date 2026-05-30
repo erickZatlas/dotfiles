@@ -14,7 +14,11 @@ walk(json.load(sys.stdin))
 ')
 
 if [ -z "$WS" ]; then
-    # No AWS VPN window exists yet — nothing to toggle.
+    # No AWS VPN window — launch it. for_window rule will float/center/sticky it.
+    if ! pgrep -f "/opt/awsvpnclient/AWS VPN Client" >/dev/null; then
+        nohup "/opt/awsvpnclient/AWS VPN Client" >/dev/null 2>&1 &
+        disown
+    fi
     exit 0
 fi
 
