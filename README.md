@@ -14,6 +14,55 @@ Personal dotfiles managed with [chezmoi](https://www.chezmoi.io/).
   - `.claude/` - Claude Code project settings
   - `CLAUDE.md` - Claude Code context for the bash config
 
+#### How it loads
+
+`.bashrc` sources three entry files; `.functions.sh` is just a loop that auto-sources
+every `*.sh` in `.bash_functions/` — drop a new file in there and it's picked up, no
+registration needed.
+
+```
+~/.bashrc
+   ├─ . bash/.exports.sh      env vars, PATH, 1Password secret loading
+   ├─ . bash/.aliases.sh      exa-for-ls, clipboard (xclip), tool launchers
+   └─ . bash/.functions.sh    loader loop ↓
+          └─ for f in bash/.bash_functions/*.sh; do . "$f"; done
+                ├─ process.sh    psf, pscmd
+                ├─ search.sh     rgand, rgor
+                └─ datadog.sh    ddlogs, ddlog-send, ddmonitor
+```
+
+Custom commands:
+
+| Command | Purpose |
+|---------|---------|
+| `psf <name>` | Find processes by name, formatted |
+| `pscmd <pid>` | Show a process's full command line, formatted |
+| `rgand pat1 pat2 …` | ripgrep lines matching **all** patterns |
+| `rgor pat1 pat2 …` | ripgrep lines matching **any** pattern |
+| `ddlogs <query> [timeframe] [limit]` | Search Datadog logs |
+| `ddlog-send <service> <message> [source] [tags]` | Send a log to Datadog |
+| `ddmonitor <subcommand>` | Datadog monitor management (list/get/create/update/mute/…) |
+
+#### Secrets (1Password)
+
+Secrets are **never stored in plaintext** — they live in the **"Bash Secrets"** item in
+the **"Dev"** 1Password vault. `load_secrets` (in `.exports.sh`) pulls them via the
+`op` CLI, formats each field into an `export`, and caches the result to
+`~/.cache/op_secrets` (mode `600`):
+
+```bash
+op item get 'Bash Secrets' --vault=Dev --format=json \
+  | jq -r '.fields[] | ... | "export \(.label)=\(.value | @sh)"' > ~/.cache/op_secrets
+```
+
+- **First terminal after boot** authenticates once (fingerprint) and writes the cache.
+- **Every later terminal** sources the cache instantly — no auth, no network.
+- **After rotating/adding a secret:** `op item edit "Bash Secrets" --vault=Dev 'NEW_VAR=value'`
+  then `load_secrets refresh` to re-fetch and rewrite the cache.
+- Requires the 1Password desktop app with CLI integration enabled
+  (Settings → Developer → Integrate with 1Password CLI). Non-secret config
+  (ports, hostnames, paths) stays as plain `export` in `.exports.sh`.
+
 ### Dev tools
 - `.gitconfig` - Git configuration with aliases and LFS setup
 - `.ideavimrc` - IdeaVim plugin configuration for IntelliJ IDEA

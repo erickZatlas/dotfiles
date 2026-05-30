@@ -8,9 +8,9 @@ Personal bash configuration files sourced by `~/.bashrc`. These files define she
 
 ## Structure
 
-- `.bash_aliases.sh` - Shell aliases (exa for ls, clipboard via xclip, tool launchers)
+- `.aliases.sh` - Shell aliases (exa for ls, clipboard via xclip, tool launchers)
 - `.exports.sh` - Environment variables, PATH additions, and 1Password secret loading
-- `.bash_functions.sh` - Loader that sources all files from `.bash_functions/*.sh`
+- `.functions.sh` - Loader that sources all files from `.bash_functions/*.sh`
 - `.bash_functions/` - Modular function files:
   - `process.sh` - Process inspection (`psf`, `pscmd`)
   - `search.sh` - Multi-pattern ripgrep wrappers (`rgand`, `rgor`)
@@ -18,7 +18,7 @@ Personal bash configuration files sourced by `~/.bashrc`. These files define she
 
 ## How It's Loaded
 
-`.bash_functions.sh` auto-sources every `*.sh` file in `.bash_functions/`. To add new functions, create a new `.sh` file in that directory - no registration needed.
+`.functions.sh` auto-sources every `*.sh` file in `.bash_functions/`. To add new functions, create a new `.sh` file in that directory - no registration needed.
 
 ## Key Custom Commands
 
