@@ -10,7 +10,7 @@ font pango:FiraCode Nerd Font 10
 
 # ─── Autostart ───────────────────────────────────────────────────────
 exec --no-startup-id dex --autostart --environment i3
-exec --no-startup-id xss-lock --transfer-sleep-lock -- i3lock --nofork
+exec --no-startup-id xss-lock --transfer-sleep-lock -- ~/.config/i3/lock.sh
 # snixembed must start before SNI-only tray apps (librepods) — --fork waits for the bus name
 exec --no-startup-id ~/.local/bin/snixembed --fork
 exec --no-startup-id nm-applet
@@ -63,7 +63,7 @@ bindsym $mod+Print exec --no-startup-id flameshot full -p ~/Pictures
 bindsym $mod+Shift+Print exec --no-startup-id flameshot screen -p ~/Pictures
 
 # Lock screen
-bindsym $mod+Escape exec --no-startup-id i3lock -c 1a1b26
+bindsym $mod+Escape exec --no-startup-id ~/.config/i3/lock.sh
 
 # ─── Audio / Brightness ─────────────────────────────────────────────
 bindsym XF86AudioRaiseVolume exec --no-startup-id wpctl set-volume @DEFAULT_AUDIO_SINK@ 5%+
